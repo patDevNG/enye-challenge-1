@@ -49,14 +49,14 @@ const  App = () => {
     useEffect(() => {
 
         const fetchHospital = async () => {
-            const parameter: RequestInit = {
-                method: 'POST',
-                mode: 'cors',
-                body: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=hospital&key=AIzaSyDCW5rzr4U74HaraNeNF04HKjFQgG3z_5o`,
-            } 
+            // const parameter: RequestInit = {
+            //     method: 'POST',
+            //     mode: 'cors',
+            //     body: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=hospital&key=AIzaSyDCW5rzr4U74HaraNeNF04HKjFQgG3z_5o`,
+            // } 
             try {
             setIsLoading(true);
-            const response = await fetch('https://us-central1-okuns-enye-challenge1.cloudfunctions.net/api', parameter);
+            const response = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=hospital&key=AIzaSyDCW5rzr4U74HaraNeNF04HKjFQgG3z_5o`);
             console.log(response);
             
             const res = await response.json();
@@ -170,7 +170,7 @@ const  App = () => {
         <Row justify='center'>
             <Col sm={24} md={20} lg={16}>
                 <Typography.Title className='text-center mt-4' level={2}>
-                    Stay Safe, Stay calm
+                    Stay Safe, Stay Calm
                 </Typography.Title>
 
                 <div className='my-2 d-flex justify-content-center'>
