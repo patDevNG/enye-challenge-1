@@ -40,11 +40,20 @@ const  App = () => {
         lat: 0,
         lng: 0,
     });
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
+    const [locationName, setLocationName] = useState('');
   
     const [hospitals, setHospitals] = useState<hospitalData[]>([]);
 
     const { lat, lng } = baseLocation;
+
+    const dataToSend = {
+        lat,
+        lng,
+        radius,
+        locationName, 
+        name: 'pharmacy,clinics'
+    }
 
     useEffect(() => {
 
@@ -52,16 +61,13 @@ const  App = () => {
             const parameter: RequestInit = {
                 method: 'POST',
                 mode: 'cors',
-                body: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=hospital&key=AIzaSyC08P9EaaVvSb4aqiYc8F7plZifcXCBc20`,
+                body: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=pharmacy&key=AIzaSyC08P9EaaVvSb4aqiYc8F7plZifcXCBc20`,
             } 
             
             try {
             setIsLoading(true);
             const response = await fetch('https://us-central1-okuns-enye-challenge1.cloudfunctions.net/api',parameter);
-            console.log(response);
-            
             const res = await response.json();
-            console.log(res);
             
             if(res.status === 'OK') {
                 const hospitalResults = cleanUpData(res.results);
@@ -102,6 +108,7 @@ const  App = () => {
         try {
             setValue(val, false);
             const results = await getGeocode({address: val});
+            setLocationName(val);
             const {lat, lng} = await getLatLng(results[0]);
             setBaseLocation({
                 lat,
