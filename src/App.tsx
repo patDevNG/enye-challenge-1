@@ -169,9 +169,12 @@ const  App = () => {
     return ( 
         <Row justify='center'>
             <Col sm={24} md={20} lg={16}>
+                <div className='search-area'>
                 <Typography.Title className='text-center mt-4' level={2}>
                     Stay Safe, Stay Calm
                 </Typography.Title>
+                </div>
+                
 
                 <div className='my-2 d-flex justify-content-center'>
                     <Combobox onSelect={handleSelect} >
