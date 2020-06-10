@@ -8,7 +8,7 @@ import {
     ComboboxOption
 } from "@reach/combobox";
 
-import {List, Slider, Col, Row, Typography, Space, notification, Spin, Statistic, Descriptions  } from 'antd';
+import {List, Slider, Col, Row, Typography, Space, notification, Spin, Statistic, Descriptions, Select  } from 'antd';
 import { CarFilled, StarFilled } from '@ant-design/icons';
 
 import "@reach/combobox/styles.css";
@@ -16,6 +16,8 @@ import "./index.css";
 
 import { calculateDistance, cleanUpData } from './utils/helper'
 import { hospitalData } from './types';
+
+import { optionValues } from './utils/values';
 
 const IconText = (params: any) => {
     const { icon, text } = params;
@@ -41,7 +43,8 @@ const  App = () => {
         lng: 0,
     });
     const [isLoading, setIsLoading] = useState(false);
-    const [locationName, setLocationName] = useState('');
+    const [address, setAddress] = useState('');
+    const [name, setName] = useState('hospital');
   
     const [hospitals, setHospitals] = useState<hospitalData[]>([]);
 
@@ -51,8 +54,8 @@ const  App = () => {
         lat,
         lng,
         radius,
-        locationName, 
-        name: 'pharmacy,clinics'
+        address, 
+        name,
     }
 
     useEffect(() => {
@@ -61,14 +64,16 @@ const  App = () => {
             const parameter: RequestInit = {
                 method: 'POST',
                 mode: 'cors',
-                body: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=pharmacy&key=AIzaSyC08P9EaaVvSb4aqiYc8F7plZifcXCBc20`,
+                body: JSON.stringify(dataToSend),
             } 
             
             try {
             setIsLoading(true);
-            const response = await fetch('https://us-central1-okuns-enye-challenge1.cloudfunctions.net/api',parameter);
-            const res = await response.json();
-            
+            const response = await fetch('http://localhost:5001/okuns-enye-challenge1/us-central1/api', parameter);
+            const resp = await response.json();
+            const res = resp[0]
+
+            console.log(res, 'res')
             if(res.status === 'OK') {
                 const hospitalResults = cleanUpData(res.results);
                 setHospitals(hospitalResults);
@@ -108,7 +113,7 @@ const  App = () => {
         try {
             setValue(val, false);
             const results = await getGeocode({address: val});
-            setLocationName(val);
+            setAddress(val);
             const {lat, lng} = await getLatLng(results[0]);
             setBaseLocation({
                 lat,
@@ -173,6 +178,15 @@ const  App = () => {
             />);
         }
     } 
+    const { Option } = Select;
+
+    const renderSelectOptions: () => JSX.Element[] = () => {
+        return optionValues.map(({key, value}) => <Option value={value} key={key}>{value}</Option>)
+    }
+
+    const handleMultipleSelect: any = (value: any) => {
+        setName(value);
+    }
     
     return ( 
         <Row justify='center'>
@@ -182,7 +196,6 @@ const  App = () => {
                     Stay Safe, Stay Calm
                 </Typography.Title>
                 </div>
-                
 
                 <div className='my-2 d-flex justify-content-center'>
                     <Combobox onSelect={handleSelect} >
@@ -197,6 +210,16 @@ const  App = () => {
                         </ComboboxPopover>
                     </Combobox>
                 </div>
+
+                <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="Please choose facility"
+                    defaultValue={['hospital']}
+                    onChange={handleMultipleSelect}
+                >
+                    {renderSelectOptions()}
+                </Select> 
 
                 <div className='d-flex justify-content-center'>
                    <p className='mr-3'>  Choose range in km:</p>
