@@ -154,7 +154,7 @@ const  App = () => {
                         <List.Item
                         actions={[
                           <IconText icon={<StarFilled style={{color: 'gold'}} />} text={rating.toFixed(1)} key="list-vertical-star-o" />,
-                          <IconText icon={<CarFilled style = {{color: 'green'}} />} text={`${distance}`} key="list-vertical-like-o" />,
+                          <IconText icon={<CarFilled style = {{color: 'green'}} />} text={`${formatter(distance)}`} key="list-vertical-like-o" />,
                         ]}>
                           <List.Item.Meta
                             title={name}
