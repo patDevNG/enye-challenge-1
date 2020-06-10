@@ -49,14 +49,15 @@ const  App = () => {
     useEffect(() => {
 
         const fetchHospital = async () => {
-            // const parameter: RequestInit = {
-            //     method: 'POST',
-            //     mode: 'cors',
-            //     body: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=hospital&key=AIzaSyDCW5rzr4U74HaraNeNF04HKjFQgG3z_5o`,
-            // } 
+            const parameter: RequestInit = {
+                method: 'POST',
+                mode: 'cors',
+                body: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=hospital&key=AIzaSyC08P9EaaVvSb4aqiYc8F7plZifcXCBc20`,
+            } 
+            
             try {
             setIsLoading(true);
-            const response = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&types=health&name=hospital&key=AIzaSyDCW5rzr4U74HaraNeNF04HKjFQgG3z_5o`);
+            const response = await fetch('https://us-central1-okuns-enye-challenge1.cloudfunctions.net/api',parameter);
             console.log(response);
             
             const res = await response.json();
