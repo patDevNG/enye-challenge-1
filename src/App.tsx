@@ -8,7 +8,7 @@ import {
     ComboboxOption
 } from "@reach/combobox";
 
-import {List, Slider, Col, Row, Typography, Space, notification, Spin, Statistic, Descriptions, Select  } from 'antd';
+import {List, Slider, Col, Row, Typography, Space, notification, Spin, Button } from 'antd';
 import { CarFilled, StarFilled } from '@ant-design/icons';
 
 import "@reach/combobox/styles.css";
@@ -35,7 +35,8 @@ const  App = () => {
         ready,
         value,
         suggestions: {status, data},
-        setValue
+        setValue,
+        clearSuggestions
     } = usePlacesAutocomplete();
     const [radius, setRadius] = useState<number>(4000);
     const [baseLocation, setBaseLocation] = useState({
@@ -70,8 +71,9 @@ const  App = () => {
             try {
             setIsLoading(true);
             const response = await fetch('http://localhost:5001/okuns-enye-challenge1/us-central1/api', parameter);
-            const resp = await response.json();
-            const res = resp[0]
+            console.log(response);
+            const res = await response.json();
+            
 
             console.log(res, 'res')
             if(res.status === 'OK') {
@@ -81,7 +83,7 @@ const  App = () => {
             } else {
                 setIsLoading(false);
                 notification.error({
-                    message: 'Error fetching data from google',
+                    message: 'Error',
                     description: res.error_message
                 });
             }
@@ -89,20 +91,29 @@ const  App = () => {
             } catch (error) {
                 setIsLoading(false);
                 notification.error({
-                message: 'Error fetching data from google',
-                description: 'Something went wrong'
+                message: 'Error',
+                description: 'Could not fetch data from google. try again'
               });
             }
         }
 
-        if (lat && lng && radius) {
+        if (lat && lng && radius && name) {
             fetchHospital();
         }
 
-    }, [lat, lng, radius]);
+    }, [lat, lng, radius,name]);
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        setValue(e.target.value);
+        setValue(e.target.value)
+        if(e.target.value.toLowerCase() ==='hospital'||e.target.value.toLowerCase() ==='clinics'|| e.target.value.toLowerCase() ==='pharmacy'|| e.target.value.toLowerCase() ==='medical office'){
+            setAddress(e.target.value)
+            handleUserLocation();
+            setName(e.target.value);
+            clearSuggestions();
+        }else{
+            // setValue(e.target.value);
+            setName('hospital')
+        }
     };
     
     const handleChange= (sliderValue: any) =>{
@@ -114,11 +125,14 @@ const  App = () => {
             setValue(val, false);
             const results = await getGeocode({address: val});
             setAddress(val);
-            const {lat, lng} = await getLatLng(results[0]);
-            setBaseLocation({
-                lat,
-                lng
-            });
+                const {lat, lng} = await getLatLng(results[0]);
+                console.log(lat,lng);
+                setName('hospitals');
+                setBaseLocation({
+                    lat,
+                    lng
+            })
+           
         } catch (error) {
             notification.error({
                 message: 'Error fetching data from google',
@@ -178,19 +192,34 @@ const  App = () => {
             />);
         }
     } 
-    const { Option } = Select;
+    // const { Option } = Select;
 
-    const renderSelectOptions: () => JSX.Element[] = () => {
-        return optionValues.map(({key, value}) => <Option value={value} key={key}>{value}</Option>)
-    }
+    // const renderSelectOptions: () => JSX.Element[] = () => {
+    //     return optionValues.map(({key, value}) => <Option value={value} key={key}>{value}</Option>)
+    // }
 
-    const handleMultipleSelect: any = (value: any) => {
-        setName(value);
+    // const handleMultipleSelect: any = (value: any) => {
+    //     setName(value);
+    // }
+    const handleUserLocation =() =>{
+        navigator.geolocation.getCurrentPosition((position:Position)=>{
+            setBaseLocation({
+                lat:position.coords.latitude,
+                lng:position.coords.longitude,
+            })
+            console.log(baseLocation)
+        }, (error:any)=>{
+            return notification.error({
+                message:"Error loading your loacation,",
+                description:error.message
+            })
+        },
+        );
     }
     
     return ( 
-        <Row justify='center'>
-            <Col sm={24} md={20} lg={16}>
+        <Row justify='space-between'>
+            <Col sm={24} md={20} lg={20}>
                 <div className='search-area'>
                 <Typography.Title className='text-center mt-4' level={2}>
                     Stay Safe, Stay Calm
@@ -204,6 +233,7 @@ const  App = () => {
                             value={value}
                             onChange={handleInput}
                             disabled={!ready}
+                            
                         />
                         <ComboboxPopover>
                             <ComboboxList>{status === "OK" && renderSuggestions()}</ComboboxList>
@@ -211,7 +241,7 @@ const  App = () => {
                     </Combobox>
                 </div>
 
-                <Select
+                {/* <Select
                     mode="multiple"
                     style={{ width: '100%' }}
                     placeholder="Please choose facility"
@@ -219,7 +249,7 @@ const  App = () => {
                     onChange={handleMultipleSelect}
                 >
                     {renderSelectOptions()}
-                </Select> 
+                </Select>  */}
 
                 <div className='d-flex justify-content-center'>
                    <p className='mr-3'>  Choose range in km:</p>
@@ -228,6 +258,10 @@ const  App = () => {
                 
                 {renderList()}
 
+            </Col>
+            <Col lg={4}>
+                
+                <Button className ='view-history' type='primary'>View Search History</Button>
             </Col>
         </Row> 
     );
