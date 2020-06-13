@@ -3,7 +3,7 @@ html{
 }
 
 .input{
-  font-size: 1.6rem;
+  font-size: 1.67rem;
   
   
   border:1px solid #ddd;
@@ -19,4 +19,11 @@ html{
 .search-area{
   margin-top: 9vh;
   
+}
+.view-history{
+  margin-top:18;
+}
+.search-history{
+  max-height: 100vh;
+  overflow: auto;
 }
