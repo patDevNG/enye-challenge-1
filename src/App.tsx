@@ -377,7 +377,10 @@ const  App = () => {
             </Col>
             <Col lg={8} className ='mt-5'>
                 
-                <Typography.Title level={1}>Search History</Typography.Title>
+                {/* <Typography.Title level={2}>
+                    
+                </Typography.Title> */}
+                <h1>Search History</h1>
                 {renderSeachHistory()}
             </Col>
         </Row> 
