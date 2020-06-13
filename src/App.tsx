@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect,} from "react";
 import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {
     Combobox,
@@ -8,16 +8,18 @@ import {
     ComboboxOption
 } from "@reach/combobox";
 
-import {List, Slider, Col, Row, Typography, Space, notification, Spin, Button } from 'antd';
+import {List, Slider, Col, Row, Typography, Space, notification, Spin, Button,  } from 'antd';
 import { CarFilled, StarFilled } from '@ant-design/icons';
 
 import "@reach/combobox/styles.css";
 import "./index.css";
 
 import { calculateDistance, cleanUpData } from './utils/helper'
-import { hospitalData } from './types';
+import { hospitalData, SearchHistory } from './types';
 
 import { optionValues } from './utils/values';
+import Item from "antd/lib/list/Item";
+
 
 const IconText = (params: any) => {
     const { icon, text } = params;
@@ -48,7 +50,7 @@ const  App = () => {
     const [name, setName] = useState('hospital');
   
     const [hospitals, setHospitals] = useState<hospitalData[]>([]);
-
+    const [searchHistory,setSearchHistory] = useState<SearchHistory[]>([])
     const { lat, lng } = baseLocation;
 
     const dataToSend = {
@@ -70,7 +72,7 @@ const  App = () => {
             
             try {
             setIsLoading(true);
-            const response = await fetch('http://localhost:5001/okuns-enye-challenge1/us-central1/api', parameter);
+            const response = await fetch('https://us-central1-okuns-enye-challenge1.cloudfunctions.net/api', parameter);
             console.log(response);
             const res = await response.json();
             
@@ -217,6 +219,66 @@ const  App = () => {
         );
     }
     
+    const handleSearchHistory = async()=>{
+        const parameter: RequestInit = {
+            method: 'GET',
+            mode: 'cors',
+        } 
+        const url =`http://localhost:5001/okuns-enye-challenge1/us-central1/api`;
+        try {
+           const response = await fetch('https://us-central1-okuns-enye-challenge1.cloudfunctions.net/api',parameter);
+           const res = await response.json(); 
+           
+           if(res.status === 200){
+            setSearchHistory(res.data);
+           }
+        } catch (error) {
+           console.log(error)
+           notification.error(
+              {
+                message:"error",
+                description:'Something went wrong, try again'
+              }
+           ) 
+        }
+    }
+
+    const renderSeachHistory = (): false | JSX.Element =>{
+        return( searchHistory.length > 0 && <List
+            itemLayout="vertical"
+            // pagination={{
+            //     pageSize: 5,
+            //   }}
+            dataSource={searchHistory}
+            renderItem={item => {
+                const { createdAt, lat,lng, name, address } = item;
+               
+
+                return (
+                    <List.Item
+                    actions={[
+                    //   <IconText icon={<StarFilled style={{color: 'gold'}} />} text={rating.toFixed(1)} key="list-vertical-star-o" />,
+                    //   <IconText icon={<CarFilled style = {{color: 'green'}} />} text={`${formatter(distance)}`} key="list-vertical-like-o" />,
+                    ]}>
+                      <List.Item.Meta 
+                        title= {address}
+                        description={createdAt}/>
+                    </List.Item>
+                  )
+            } }
+        />
+        );
+    }
+        const handleSearchCLick = (e: React.ChangeEvent<HTMLInputElement>):void=>{
+            setSearchHistory([]);
+            setBaseLocation({
+                lat:lat,
+                lng:lng
+            });
+            setAddress(address);
+            setName(name);
+           
+        }
     return ( 
         <Row justify='space-between'>
             <Col sm={24} md={20} lg={20}>
@@ -261,7 +323,8 @@ const  App = () => {
             </Col>
             <Col lg={4}>
                 
-                <Button className ='view-history' type='primary'>View Search History</Button>
+                <Button className ='view-history' type='primary' onClick={handleSearchHistory}>View Search History</Button>
+                {renderSeachHistory()}
             </Col>
         </Row> 
     );
