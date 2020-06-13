@@ -21,5 +21,9 @@ html{
   
 }
 .view-history{
-  margin-top:18vh
+  margin-top:18;
+}
+.search-history{
+  max-height: 100vh;
+  overflow: auto;
 }
