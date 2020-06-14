@@ -53,6 +53,7 @@ const  App = () => {
     const [hospitals, setHospitals] = useState<hospitalData[]>([]);
     const [searchHistory,setSearchHistory] = useState<SearchHistory[]>([])
     const { lat, lng } = baseLocation;
+    const [shouldFetchSearchHistory, setShouldFetchSearchHistory] = useState('false');
 
     const dataToSend = {
         lat,
@@ -82,6 +83,7 @@ const  App = () => {
             if(res.status === 'OK') {
                 const hospitalResults = cleanUpData(res.results);
                 setHospitals(hospitalResults);
+                setShouldFetchSearchHistory('true')
                 setIsLoading(false);
             } else {
                 setIsLoading(false);
@@ -135,7 +137,7 @@ const  App = () => {
             }
         }
         handleSearchHistory();
-    },[])
+    },[shouldFetchSearchHistory])
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setValue(e.target.value)
@@ -330,9 +332,7 @@ const  App = () => {
             <Row justify='space-between'gutter={[32,32]}>
             <Col sm={24} md={20} lg={16}>
                 
-                <Typography.Title className='mt-4 ' level={2}>
-                    Stay Safe, Stay Calm
-                </Typography.Title>
+                <h1 className ='mt-4'> Stay Safe, Stay Calm</h1>
                 
 
                 <div className='my-2 '>
