@@ -26,4 +26,9 @@ html{
 .search-history{
   max-height: 100vh;
   overflow: auto;
+
+}
+
+.auth{
+  margin-top: 50px;
 }
