@@ -1,9 +1,7 @@
 import React, { useState, useEffect,} from "react";
 import moment from 'moment';
-// import firebase from 'firebase'
-// import 'firebase/firestore'
 import firebase from './firebaseConfig';
-import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
+
 import {
     Combobox,
     ComboboxInput,
@@ -12,7 +10,7 @@ import {
     ComboboxOption
 } from "@reach/combobox";
 
-import {List, Slider, Col, Row, Typography, Space, notification, Spin, Button, AutoComplete } from 'antd';
+import {List, Slider, Col, Row, Space, notification, Spin, Button, AutoComplete } from 'antd';
 import { CarFilled, StarFilled } from '@ant-design/icons';
 
 import "@reach/combobox/styles.css";
@@ -23,9 +21,6 @@ import { hospitalData, SearchHistory } from './types';
 import {HISTORY} from './graphql/mutation';
 import {useQuery} from '@apollo/react-hooks';
 
-import { optionValues } from './utils/values';
-import Item from "antd/lib/list/Item";
-import { QueryData } from "@apollo/react-hooks/lib/data/QueryData";
 
 
 
@@ -46,7 +41,6 @@ const Home=() => {
         lng: 0,
     });
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingSearchHistory, setIsLoadingSearchHistory] = useState(false);
     const [address, setAddress] = useState('');
     const [name, setName] = useState('hospital');
     const [val, setValue] = useState('')
@@ -69,15 +63,7 @@ const Home=() => {
             id:userId
         }
     })
-    if(data){
-        console.log("DAta...........history",data.history);
-        console.log(data.history[0])
-        console.log(searchHistory)
-        // setSearchHistory(data.history)
-        // console.log(searchHistory);
-        
-    }
-    // const requestedData = data? data.history:{};
+    
     useEffect(()=>{
        refetch();
     //    console.log(data)
@@ -149,42 +135,6 @@ const Home=() => {
 
     }, [lat, lng, radius,name]);
 
-    // useEffect(()=>{
-    //     const handleSearchHistory = async()=>{
-    //         const parameter: RequestInit = {
-    //             method: 'POST',
-    //             mode: 'cors',
-    //             body:JSON.stringify({
-    //                 id:`${userId}`
-    //             })
-    //         } 
-    //         const url =`http://localhost:5001/okuns-enye-challenge1/us-central1/api/`;
-    //         try {
-    //             setIsLoadingSearchHistory(true);
-    //            const response = await fetch(`https://us-central1-okuns-enye-challenge1.cloudfunctions.net/api/history`,parameter);
-    //            const res = await response.json(); 
-               
-    //            if(res.status === 200){
-    //                console.log(res.data);
-                   
-    //                setIsLoadingSearchHistory(false)
-    //             // setSearchHistory(res.data);
-            
-    //            }
-    //         } catch (error) {
-    //             setIsLoadingSearchHistory(false);
-    //            console.log(error)
-    //            notification.error(
-    //               {
-    //                 message:"error",
-    //                 description:'Something went wrong, try again'
-    //               }
-    //            ) 
-    //         }
-    //     }
-    //     handleSearchHistory();
-    // },[shouldFetchSearchHistory])
-
     useEffect(() => {
         if(data && data.history) {
           setSearchHistory(data.history)
@@ -193,15 +143,6 @@ const Home=() => {
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setValue(e.target.value)
-        // if(e.target.value.toLowerCase() ==='hospital'||e.target.value.toLowerCase() ==='clinics'|| e.target.value.toLowerCase() ==='pharmacy'|| e.target.value.toLowerCase() ==='medical office'){
-        //     setAddress(e.target.value)
-        //     handleUserLocation();
-        //     setName(e.target.value);
-        //     clearSuggestions();
-        // }else{
-        //     // setValue(e.target.value);
-        //     setName('hospital')
-        // }
     };
     
     const handleChange= (sliderValue: any) =>{
@@ -210,20 +151,10 @@ const Home=() => {
 
     const handleSelect = async (val: string): Promise<void> => {
         try {
-            // setValue(val, false);
-            // const results = await getGeocode({address: val});
-            // setAddress(val);
             handleUserLocation();
-                // const {lat, lng} = await getLatLng(results[0]);
-                console.log(lat,lng);
                 setName(val);
                 setAddress(val);
                 setValue(val)
-            //     setBaseLocation({
-            //         lat,
-            //         lng
-            // })
-           
         } catch (error) {
             notification.error({
                 message: 'Error fetching data from google',
@@ -232,18 +163,6 @@ const Home=() => {
         } 
     };
    
-
-    // const renderSuggestions = (): JSX.Element => {
-    //     const possiblePlaces = data.map(({id, description}: any) => (
-    //         <ComboboxOption key={id} value={description}/>
-    //     ));
-
-    //     return (
-    //         <>
-    //             {possiblePlaces}
-    //         </>
-    //     );
-    // }; 
     const  formatter= (value: any): string => {
         return `${value}km`;
     }
@@ -313,24 +232,11 @@ const Home=() => {
         }else{
             return( searchHistory.length > 0 && <List
                 itemLayout="vertical"
-                // pagination={{
-                //     pageSize: 5,
-                //   }}
                 dataSource={searchHistory}
                 renderItem={item => {
-                    console.log(item);
-                    
                     const { createdAt, lat,lng, name, address } = item;
-                   console.log((item));
-                  
-                   
-    
                     return (
-                        <List.Item
-                        actions={[
-                        //   <IconText icon={<StarFilled style={{color: 'gold'}} />} text={rating.toFixed(1)} key="list-vertical-star-o" />,
-                        //   <IconText icon={<CarFilled style = {{color: 'green'}} />} text={`${formatter(distance)}`} key="list-vertical-like-o" />,
-                        ]}>
+                        <List.Item>
                           <List.Item.Meta 
                             title= {<a onClick= {(e)=>{handleSearchCLick(e,lat,lng,name,address)}}>{address}</a>}
                             description={createdAt}/>
@@ -354,35 +260,6 @@ const Home=() => {
 
            
         }
-        const searchOptions = [
-            { value: 'hospital' },
-            { value: 'clinics' },
-            { value: 'pharmacy' },
-            { value: 'medical office' }
-          ];
-          const handleInputChange = (data: string) => {
-            setValue(data);
-          };
-          const clearSearchBox =()=>{
-              if(val !== ''){
-                  setValue('');
-              }
-          }
-          const Complete: React.FC = () => (
-            <AutoComplete 
-              style={{ width: 500 }}
-              value={val}
-              options={searchOptions}
-              onSelect ={handleSelect}
-              onChange ={handleInputChange}
-              onClick ={clearSearchBox}
-            //   oclnChange ={handleInput}
-              placeholder=" Search for 'hospitals', 'pharmacy','clinics', 'medical office'"
-              filterOption={(inputValue, option:any) =>
-                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-              }
-            />
-          );
     return ( 
         <div className="container">
             <Row justify='space-between'gutter={[32,32]}>
@@ -413,16 +290,6 @@ const Home=() => {
                     {/* <Complete/> */}
                 </div>
 
-                {/* <Select
-                    mode="multiple"
-                    style={{ width: '100%' }}
-                    placeholder="Please choose facility"
-                    defaultValue={['hospital']}
-                    onChange={handleMultipleSelect}
-                >
-                    {renderSelectOptions()}
-                </Select>  */}
-
                 <div >
                    <p className='mr-3'>  Choose range in km:</p>
                    <Slider style={{ width: 250 }} onChange={handleChange} tipFormatter={formatter} min={4} max={20} step={1} />   
@@ -432,10 +299,6 @@ const Home=() => {
 
             </Col>
             <Col lg={8} className ='mt-5'>
-                
-                {/* <Typography.Title level={2}>
-                    
-                </Typography.Title> */}
                 <h1>Search History</h1>
                 {renderSeachHistory()}
             </Col>
