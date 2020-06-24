@@ -210,7 +210,6 @@ const Home=() => {
                 lat:position.coords.latitude,
                 lng:position.coords.longitude,
             })
-            console.log(baseLocation)
         }, (error:any)=>{
             return notification.error({
                 message:"Error loading your loacation,",
